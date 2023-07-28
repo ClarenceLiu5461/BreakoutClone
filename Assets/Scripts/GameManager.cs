@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     public Text scoreText;
     public Text ballsText;
     public Text levelText;
+    public Text highscoreText;
 
     public GameObject[] levels;
 
@@ -42,7 +43,9 @@ public class GameManager : MonoBehaviour
     public int Balls
     {
         get { return balls; }
-        set { balls = value; }
+        set { balls = value;
+            ballsText.text = "BALLS: " + balls;
+        }
     }
 
     private int level;
@@ -50,7 +53,9 @@ public class GameManager : MonoBehaviour
     public int Level
     {
         get { return level; }
-        set { level = value; }
+        set { level = value;
+            levelText.text = "LEVELS: " + level;
+        }
     }
 
 
@@ -100,12 +105,20 @@ public class GameManager : MonoBehaviour
                         SwitchState(State.GAMEOVER);
                     }
                 }
+                if (currentLevel != null && currentLevel.transform.childCount == 0 && !isSwitchingState)
+                {
+                    SwitchState(State.LEVELCOMPLETE);
+                }
                 break;
             case State.LEVELCOMPLETE:
                 break;
             case State.LOADLEVEL:
                 break;
             case State.GAMEOVER:
+                if (Input.anyKeyDown)
+                {
+                    SwitchState(State.MENU);
+                }
                 break;
         }
     }
@@ -115,20 +128,31 @@ public class GameManager : MonoBehaviour
         switch (newState)
         {
             case State.MENU:
+                Cursor.visible = true;
+                highscoreText.text = "HIGHSCORE: " + PlayerPrefs.GetInt("highscore");
                 menuPanel.SetActive(true);
                 break;
             case State.INIT:
+                Cursor.visible = false;
                 playPanel.SetActive(true);
                 Score = 0;
                 Level = 0;
                 Balls = 3;
+                if (currentLevel != null)
+                {
+                    Destroy(currentLevel);
+                }
                 Instantiate(playerPrefab);
                 SwitchState(State.LOADLEVEL);
                 break;
             case State.PLAY:
                 break;
             case State.LEVELCOMPLETE:
+                Destroy(currentBall);
+                Destroy(currentLevel);
+                level++;
                 levelCompletePanel.SetActive(true);
+                SwitchState(State.LOADLEVEL, 2f);
                 break;
             case State.LOADLEVEL:
                 if (Level >= levels.Length)
@@ -142,6 +166,10 @@ public class GameManager : MonoBehaviour
                 }
                 break;
             case State.GAMEOVER:
+                if (Score > PlayerPrefs.GetInt("highscore"))
+                {
+                    PlayerPrefs.SetInt("highscore",Score);
+                }
                 gameOverPanel.SetActive(true);
                 break;
         }

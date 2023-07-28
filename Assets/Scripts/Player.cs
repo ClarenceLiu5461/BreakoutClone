@@ -10,7 +10,6 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-        Cursor.visible = false;
         rb = GetComponent<Rigidbody>();
     }
 

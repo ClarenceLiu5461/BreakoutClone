@@ -8,17 +8,29 @@ public class Ball : MonoBehaviour
     
     private Rigidbody rb;
     private Vector3 velocity;
+    private Renderer rd;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.velocity = Vector3.down * speed;
+        rd = GetComponent<Renderer>();
+        Invoke("Launch", 0.5f);
+    }
+
+    void Launch()
+    {
+        rb.velocity = Vector3.up * speed;
     }
 
     void FixedUpdate()
     {
         rb.velocity = rb.velocity.normalized * speed;
         velocity = rb.velocity;
+        if (!rd.isVisible)
+        {
+            GameManager.Instance.Balls--;
+            Destroy(gameObject);
+        }
     }
 
     private void OnCollisionEnter(Collision other)
