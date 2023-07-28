@@ -1,2 +1,2 @@
 # BreakoutClone
- BreakoutClone Game
+A simple BreakoutClone Game
